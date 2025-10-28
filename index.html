@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confetti Reveal</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: radial-gradient(circle at top, #fefefe, #dfe6f1);
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      overflow: hidden;
+      transition: background 0.5s ease;
+    }
+
+    h1 {
+      margin-bottom: 30px;
+      color: #333;
+      text-align: center;
+      font-size: 2rem;
+    }
+
+    .ball-container {
+      display: flex;
+      gap: 50px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .ball {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: linear-gradient(145deg, #ff9a9e, #fad0c4);
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .ball:hover {
+      transform: scale(1.1);
+    }
+
+    .message {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 1.1rem;
+      color: #444;
+      visibility: hidden;
+      font-weight: 900;
+    }
+
+    /* === Confetti === */
+    .confetti {
+      position: fixed;
+      width: 8px;
+      height: 8px;
+      opacity: 0.9;
+      border-radius: 2px;
+      animation: fall linear forwards;
+      z-index: 5;
+    }
+
+    @keyframes fall {
+      0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+      }
+
+      100% {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+      }
+    }
+
+    /* === Modal Styles === */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal-content {
+      background: #fff;
+      padding: 30px 40px;
+      border-radius: 16px;
+      text-align: center;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      animation: popIn 0.3s ease;
+      max-width: 90%;
+    }
+
+    @keyframes popIn {
+      from {
+        transform: scale(0.8);
+        opacity: 0;
+      }
+
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    .modal h2 {
+      margin-bottom: 20px;
+      color: #333;
+      font-size: 1.5rem;
+    }
+
+    .modal button {
+      margin: 10px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .btn-yes {
+      background: #4CAF50;
+      color: #fff;
+    }
+
+    .btn-yes:hover {
+      background: #45a049;
+    }
+
+    .btn-no {
+      background: #f44336;
+      color: #fff;
+    }
+
+    .btn-no:hover {
+      background: #da190b;
+    }
+
+    /* === Cross display === */
+    .cross {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: none;
+      width: 20px;
+      height: 200px;
+      background: #333;
+    }
+
+    .cross::before {
+      content: "";
+      position: absolute;
+      top: 40px;
+      left: -50px;
+      width: 120px;
+      height: 20px;
+      background: #333;
+    }
+
+    .show-cross .cross {
+      display: block;
+    }
+
+    /* === Responsive Breakpoints === */
+
+    /* Tablets (landscape & portrait) */
+    @media (max-width: 1024px) {
+      .ball-container {
+        gap: 40px;
+      }
+
+      .ball {
+        width: 90px;
+        height: 90px;
+      }
+
+      h1 {
+        font-size: 1.8rem;
+      }
+    }
+
+    /* Mobile landscape / small tablets */
+    @media (max-width: 768px) {
+      .ball-container {
+        flex-direction: row;
+        gap: 30px;
+      }
+
+      .ball {
+        width: 80px;
+        height: 80px;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      .message {
+        font-size: 1rem;
+        padding: 0 10px;
+      }
+    }
+
+    /* Small phones */
+    @media (max-width: 480px) {
+      .ball {
+        width: 70px;
+        height: 70px;
+      }
+
+      h1 {
+        font-size: 1.3rem;
+      }
+
+      .modal-content {
+        padding: 20px;
+      }
+
+      .modal h2 {
+        font-size: 1.2rem;
+      }
+
+      .modal button {
+        width: 100px;
+        padding: 8px;
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Modal -->
+  <div class="modal" id="modal">
+    <div class="modal-content">
+      <h2>Do you want to find out what the worship songs are for this week's YA Bible study?</h2>
+      <div>
+        <button class="btn-yes" id="yesBtn">Yes! Help me prepare my heart.</button>
+        <button class="btn-no" id="noBtn">No, thanks. I prefer surprises.</button>
+      </div>
+    </div>
+  </div>
+
+  <h1 id="prompt-text"></h1>
+
+  <div class="ball-container" id="ballContainer">
+    <div class="ball" data-message="Come Let Us Worship And Bow Down - Steffany Gretzinger"></div>
+    <div class="ball" data-message="Give Thanks - Steffany Gretzinger"></div>
+    <div class="ball" data-message="Show Me Your Face - *also* Steffany Gretzinger"></div>
+  </div>
+
+  <div class="message" id="message"></div>
+
+  <!-- Cross -->
+  <div class="cross"></div>
+
+  <script>
+    const modal = document.getElementById("modal");
+    const yesBtn = document.getElementById("yesBtn");
+    const noBtn = document.getElementById("noBtn");
+    const promptDisplay = document.getElementById("prompt-text");
+    const messageDisplay = document.getElementById("message");
+    const balls = document.querySelectorAll(".ball");
+    const body = document.body;
+
+    window.addEventListener("load", () => {
+      modal.classList.add("active");
+    });
+
+    yesBtn.addEventListener("click", () => {
+      modal.classList.remove("active");
+      promptDisplay.textContent = "Click on a ball to reveal one song.";
+      enableBalls();
+    });
+
+    noBtn.addEventListener("click", () => {
+      modal.classList.remove("active");
+      promptDisplay.remove();
+      document.getElementById("ballContainer").remove();
+      messageDisplay.remove();
+      body.classList.add("show-cross");
+      body.style.background = "#fefefe";
+    });
+
+    function enableBalls() {
+      balls.forEach(ball => {
+        ball.addEventListener("click", (e) => {
+          startRainingConfetti(5000); // confetti rains for 5 seconds
+          messageDisplay.style.visibility = "visible";
+          messageDisplay.textContent = e.target.getAttribute("data-message");
+        });
+      });
+    }
+
+    // 🌈 Raining confetti generator
+    function startRainingConfetti(duration = 5000) {
+      const colors = ["#FF4C4C", "#FFD93D", "#4CFF4C", "#4C8CFF", "#FF4CF0", "#FF9A00", "#00E0FF"];
+      const startTime = Date.now();
+
+      const confettiInterval = setInterval(() => {
+        const elapsed = Date.now() - startTime;
+        if (elapsed > duration) {
+          clearInterval(confettiInterval);
+          return;
+        }
+        createConfetti();
+      }, 80); // new confetti roughly every 80ms
+
+      function createConfetti() {
+        const confetti = document.createElement("div");
+        confetti.classList.add("confetti");
+        confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.left = Math.random() * window.innerWidth + "px";
+        confetti.style.top = "-10px";
+        confetti.style.width = Math.random() * 10 + 5 + "px";
+        confetti.style.height = Math.random() * 10 + 5 + "px";
+        const duration = Math.random() * 2 + 2; // random fall time
+        confetti.style.animationDuration = `${duration}s`;
+        document.body.appendChild(confetti);
+
+        setTimeout(() => confetti.remove(), duration * 1000);
+      }
+    }
+  </script>
+
+</body>
+
+</html>
