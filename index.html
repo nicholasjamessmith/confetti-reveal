@@ -34,15 +34,30 @@
       justify-content: center;
     }
 
+    /* 🟡 Mustard-yellow celebration ball design */
     .ball {
       width: 100px;
       height: 100px;
       border-radius: 50%;
-      background: linear-gradient(145deg, #ff9a9e, #fad0c4);
+      background: radial-gradient(circle at 30% 30%, #ffdc73, #d4a72c 80%);
       position: relative;
       cursor: pointer;
       transition: transform 0.3s ease;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      box-shadow: inset 0 4px 10px rgba(255, 255, 255, 0.4),
+        0 5px 15px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+    }
+
+    /* subtle waffle texture overlay */
+    .ball::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.05) 0 2px, transparent 2px 8px),
+        repeating-linear-gradient(-45deg, rgba(0, 0, 0, 0.05) 0 2px, transparent 2px 8px);
+      border-radius: 50%;
+      pointer-events: none;
     }
 
     .ball:hover {
@@ -269,9 +284,9 @@
   <h1 id="prompt-text"></h1>
 
   <div class="ball-container" id="ballContainer">
-    <div class="ball" data-message="Come Let Us Worship And Bow Down - Steffany Gretzinger"></div>
-    <div class="ball" data-message="Give Thanks - Steffany Gretzinger"></div>
-    <div class="ball" data-message="Show Me Your Face - *also* Steffany Gretzinger"></div>
+    <div class="ball" data-message="Revelation Song"></div>
+    <div class="ball" data-message="Holy and Annointed One"></div>
+    <div class="ball" data-message="Whatever the Spirit leads"></div>
   </div>
 
   <div class="message" id="message"></div>
